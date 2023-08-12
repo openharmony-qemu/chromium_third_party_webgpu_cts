@@ -1,37 +1,22 @@
-# chromium_third_party_webgpu_cts
+# WebGPU Conformance Test Suite
 
-#### 介绍
-第三方软件webgpu-cts
+This is the conformance test suite for WebGPU.
+It tests the behaviors defined by the [WebGPU specification](https://gpuweb.github.io/gpuweb/).
 
-#### 软件架构
-软件架构说明
+The contents of this test suite are considered **normative**; implementations must pass
+them to be WebGPU-conformant. Mismatches between the specification and tests are bugs.
 
+This test suite can be embedded inside [WPT](https://github.com/web-platform-tests/wpt) or run in standalone.
 
-#### 安装教程
+## [Launch the standalone CTS runner / test plan viewer](https://gpuweb.github.io/cts/standalone/)
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## Contributing
 
-#### 使用说明
+Please read the [introductory guidelines](docs/intro/README.md) before contributing.
+Other documentation may be found in [`docs/`](docs/) and in the [helper index](https://gpuweb.github.io/cts/docs/tsdoc/) ([source](docs/helper_index.txt)).
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+Read [CONTRIBUTING.md](CONTRIBUTING.md) on licensing.
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+For realtime communication about WebGPU spec and test, join the
+[#WebGPU:matrix.org room](https://app.element.io/#/room/#WebGPU:matrix.org)
+on Matrix.
