@@ -70,51 +70,19 @@ used to filter file path.
                 desc="Filters for compatibility,license header policies">
                 <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/buffer.spec.ts"
                     desc="" />
-                    <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/texture.spec.ts"
-                    desc="" />
+                    <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/texture.spec.ts" desc="" />
+                    <filteritem type="filepath" name="standalone/third_party/jquery/jquery-3.3.1.min.js" desc="" />
             </filefilter>
 
             <filefilter name="defaultFilter">
-                <filteritem type="filepath" name="README.OpenSource"
-                    desc="" />
+                <filteritem type="filepath" name="README.OpenSource" desc="" />
+                <filteritem type="filepath" name=".*png" desc="" />
+                <filteritem type="filepath" name=".*webm" desc="" />
+                <filteritem type="filepath" name=".*enc" desc="" />
+                <filteritem type="filepath" name=".*mp4" desc="" />
+                <filteritem type="filepath" name=".*ogv" desc="" />
+                <filteritem type="filepath" name=".*enc" desc="" />
             </filefilter>
         </filefilterlist>
-        <licensematcherlist>
-            <!-- <licensematcher name="LLVM License" desc="">
-                <licensetext name="
-                /* This file is distributed under the University of Illinois Open Source      */
-                /* License. See LICENSE.TXT for details.                                      */
-                " desc="" />
-                </licensematcher>
-            <licensematcher name="OpenBSD" desc="">
-                <licensetext name="
-                * This code is derived from OpenBSD's libc, original license follows:
-                *
-                * Copyright (c) 1998 Todd C. Miller &gt;Todd.Miller@courtesan.com&gt;
-            " desc="" />
-            </licensematcher>
-            <licensematcher name="original license" desc="">
-                <licensetext name="
-                * This is an OpenSSL-compatible implementation of the RSA Data Security, Inc.
-                * MD5 Message-Digest Algorithm (RFC 1321).
-            " desc="" />
-            </licensematcher>
-            <licensematcher name="Khronos License2" desc="">
-                <licensetext name="
-                * Copyright (c) 2008-2018 The Khronos Group Inc.
-            " desc="" />
-            </licensematcher>
-            <licensematcher name="Khronos License3" desc="">
-                <licensetext name="
-                * Copyright (c) 2007-2016 The Khronos Group Inc
-            " desc="" />
-            </licensematcher> -->
-            <licensematcher name="Khronos Group License" desc="">
-                
-                <licensetext name="
-                jQuery v3.3.1 | (c) JS Foundation and other contributors
-            " desc="" />
-            </licensematcher>
-        </licensematcherlist>
     </oatconfig>
 </configuration>
