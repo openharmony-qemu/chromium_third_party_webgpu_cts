@@ -1,6 +1,6 @@
 [
     {
-        "Name": "chromium_third_party_webgpu_cts",                   # 上游开源软件名全称
+        "Name": "cts",                   # 上游开源软件名全称
         "License": "BSD-3-Clause",         # 上游开源软件中包含的许可证信息
         "License File": "LICENSE.txt"     # 许可证所在文件路径
         "Version Number": "fc207904abbb29864991c71c7156336455a3d892",
