@@ -67,9 +67,9 @@ used to filter file path.
         <filefilterlist>
             <filefilter name="defaultPolicyFilter"
                 desc="Filters for compatibility,license header policies">
-                <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/buffer.spec.ts" desc="chrom原生文件无license" />
-                <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/texture.spec.ts" desc="chrom原生文件无license" />
-                <filteritem type="filepath" name="standalone/third_party/jquery/jquery-3.3.1.min.js" desc="chrom原生文件无license" />
+                <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/buffer.spec.ts" desc="chromium原生文件无license" />
+                <filteritem type="filepath" name="src/webgpu/api/validation/queue/destroyed/texture.spec.ts" desc="chromium原生文件无license" />
+                <filteritem type="filepath" name="standalone/third_party/jquery/jquery-3.3.1.min.js" desc="chromium原生文件无license" />
             </filefilter>
 
             <filefilter name="defaultFilter">
@@ -77,15 +77,15 @@ used to filter file path.
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter">
                 <filteritem type="filename" name="*.png"
-                    desc="Chromium原生二进制文件，不会使用" />
+                    desc="chromium原生二进制文件，不会使用" />
                 <filteritem type="filename" name="*.webm"
-                    desc="Chromium原生二进制文件，不会使用" />
+                    desc="chromium原生二进制文件，不会使用" />
                 <filteritem type="filename" name="*.enc"
-                    desc="Chromium原生二进制文件，不会使用" />
+                    desc="chromium原生二进制文件，不会使用" />
                 <filteritem type="filename" name="*.mp4"
-                    desc="Chromium原生二进制文件，不会使用" />
+                    desc="chromium原生二进制文件，不会使用" />
                 <filteritem type="filename" name="*.ogv"
-                    desc="Chromium原生二进制文件，不会使用" />
+                    desc="chromium原生二进制文件，不会使用" />
             </filefilter>
         </filefilterlist>
     </oatconfig>
