@@ -1,11 +1,11 @@
 [
     {
-        "Name": "cts",                   # 上游开源软件名全称
-        "License": "BSD-3-Clause",         # 上游开源软件中包含的许可证信息
-        "License File": "LICENSE.txt"     # 许可证所在文件路径
+        "Name": "cts",                  
+        "License": "BSD-3-Clause",        
+        "License File": "LICENSE.txt",     
         "Version Number": "fc207904abbb29864991c71c7156336455a3d892",
         "Owner": "jinchanggang@huawei.com",
-        "Upstream URL": "https://chromium.googlesource.com/external/github.com/gpuweb/cts.git@fc207904abbb29864991c71c7156336455a3d892",   # 上游软件包发布地址
-        "Description": "第三方软件webgpu-cts"           # 开源软件功能描述
+        "Upstream URL": "https://chromium.googlesource.com/external/github.com/gpuweb/cts.git@fc207904abbb29864991c71c7156336455a3d892",  
+        "Description": "第三方软件webgpu-cts"         
     }
 ]
