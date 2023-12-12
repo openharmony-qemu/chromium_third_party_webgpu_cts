@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "cts",                  
+        "License": "BSD-3-Clause",        
+        "License File": "LICENSE.txt",     
+        "Version Number": "fc207904abbb29864991c71c7156336455a3d892",
+        "Owner": "jinchanggang@huawei.com",
+        "Upstream URL": "https://chromium.googlesource.com/external/github.com/gpuweb/cts.git@fc207904abbb29864991c71c7156336455a3d892",  
+        "Description": "第三方软件webgpu-cts"         
+    }
+]
