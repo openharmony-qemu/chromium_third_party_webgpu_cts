@@ -4,17 +4,17 @@ copyToTexture with HTMLCanvasElement and OffscreenCanvas sources.
 
 import { makeTestGroup } from '../../../common/framework/test_group.js';
 import { skipTestCase } from '../../../common/util/util.js';
+import { kCanvasAlphaModes } from '../../capability_info.js';
 import {
-  kCanvasAlphaModes,
   kTextureFormatInfo,
   kValidTextureFormatsForCopyE2T,
   RegularTextureFormat,
-} from '../../capability_info.js';
-import { CopyToTextureUtils } from '../../util/copy_to_texture.js';
+} from '../../format_info.js';
+import { TextureUploadingUtils } from '../../util/copy_to_texture.js';
 import { CanvasType, kAllCanvasTypes, createCanvas } from '../../util/create_elements.js';
 import { TexelCompareOptions } from '../../util/texture/texture_ok.js';
 
-class F extends CopyToTextureUtils {
+class F extends TextureUploadingUtils {
   init2DCanvasContentWithColorSpace({
     width,
     height,
@@ -97,9 +97,7 @@ class F extends CopyToTextureUtils {
     }
 
     const imageData = new ImageData(imagePixels, width, height, { colorSpace });
-    // MAINTENANCE_TODO: Remove as any when tsc support imageData.colorSpace
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    if (typeof (imageData as any).colorSpace === 'undefined') {
+    if (typeof imageData.colorSpace === 'undefined') {
       this.skip('color space attr is not supported for ImageData');
     }
 
@@ -403,7 +401,7 @@ class F extends CopyToTextureUtils {
       dstPremultiplied: boolean;
     }
   ) {
-    const dst = this.device.createTexture({
+    const dst = this.createTextureTracked({
       size: {
         width: p.width,
         height: p.height,
@@ -468,10 +466,10 @@ g.test('copy_contents_from_2d_context_canvas')
   Then call copyExternalImageToTexture() to do a full copy to the 0 mipLevel
   of dst texture, and read the contents out to compare with the canvas contents.
 
-  Provide premultiplied input if 'premultipliedAlpha' in 'GPUImageCopyTextureTagged'
+  Provide premultiplied input if 'premultipliedAlpha' in 'GPUCopyExternalImageDestInfo'
   is set to 'true' and unpremultiplied input if it is set to 'false'.
 
-  If 'flipY' in 'GPUImageCopyExternalImage' is set to 'true', copy will ensure the result
+  If 'flipY' in 'GPUCopyExternalImageSourceInfo' is set to 'true', copy will ensure the result
   is flipped.
 
   The tests covers:
@@ -479,7 +477,7 @@ g.test('copy_contents_from_2d_context_canvas')
   - Valid 2d context type
   - Valid dstColorFormat of copyExternalImageToTexture()
   - Valid dest alphaMode
-  - Valid 'flipY' config in 'GPUImageCopyExternalImage' (named 'srcDoFlipYDuringCopy' in cases)
+  - Valid 'flipY' config in 'GPUCopyExternalImageSourceInfo' (named 'srcDoFlipYDuringCopy' in cases)
   - TODO(#913): color space tests need to be added
 
   And the expected results are all passed.
@@ -495,6 +493,9 @@ g.test('copy_contents_from_2d_context_canvas')
       .combine('width', [1, 2, 4, 15])
       .combine('height', [1, 2, 4, 15])
   )
+  .beforeAllSubcases(t => {
+    t.skipIfTextureFormatNotSupported(t.params.dstColorFormat);
+  })
   .fn(t => {
     const { width, height, canvasType, dstAlphaMode } = t.params;
 
@@ -526,10 +527,10 @@ g.test('copy_contents_from_gl_context_canvas')
   Then call copyExternalImageToTexture() to do a full copy to the 0 mipLevel
   of dst texture, and read the contents out to compare with the canvas contents.
 
-  Provide premultiplied input if 'premultipliedAlpha' in 'GPUImageCopyTextureTagged'
+  Provide premultiplied input if 'premultipliedAlpha' in 'GPUCopyExternalImageDestInfo'
   is set to 'true' and unpremultiplied input if it is set to 'false'.
 
-  If 'flipY' in 'GPUImageCopyExternalImage' is set to 'true', copy will ensure the result
+  If 'flipY' in 'GPUCopyExternalImageSourceInfo' is set to 'true', copy will ensure the result
   is flipped.
 
   The tests covers:
@@ -538,7 +539,7 @@ g.test('copy_contents_from_gl_context_canvas')
   - Valid dstColorFormat of copyExternalImageToTexture()
   - Valid source image alphaMode
   - Valid dest alphaMode
-  - Valid 'flipY' config in 'GPUImageCopyExternalImage'(named 'srcDoFlipYDuringCopy' in cases)
+  - Valid 'flipY' config in 'GPUCopyExternalImageSourceInfo'(named 'srcDoFlipYDuringCopy' in cases)
   - TODO: color space tests need to be added
 
   And the expected results are all passed.
@@ -556,6 +557,9 @@ g.test('copy_contents_from_gl_context_canvas')
       .combine('width', [1, 2, 4, 15])
       .combine('height', [1, 2, 4, 15])
   )
+  .beforeAllSubcases(t => {
+    t.skipIfTextureFormatNotSupported(t.params.dstColorFormat);
+  })
   .fn(t => {
     const { width, height, canvasType, contextName, srcPremultiplied, dstAlphaMode } = t.params;
 
@@ -591,10 +595,10 @@ g.test('copy_contents_from_gpu_context_canvas')
   Then call copyExternalImageToTexture() to do a full copy to the 0 mipLevel
   of dst texture, and read the contents out to compare with the canvas contents.
 
-  Provide premultiplied input if 'premultipliedAlpha' in 'GPUImageCopyTextureTagged'
+  Provide premultiplied input if 'premultipliedAlpha' in 'GPUCopyExternalImageDestInfo'
   is set to 'true' and unpremultiplied input if it is set to 'false'.
 
-  If 'flipY' in 'GPUImageCopyExternalImage' is set to 'true', copy will ensure the result
+  If 'flipY' in 'GPUCopyExternalImageSourceInfo' is set to 'true', copy will ensure the result
   is flipped.
 
   The tests covers:
@@ -603,7 +607,7 @@ g.test('copy_contents_from_gpu_context_canvas')
   - Valid dstColorFormat of copyExternalImageToTexture()
   - TODO: test more source image alphaMode
   - Valid dest alphaMode
-  - Valid 'flipY' config in 'GPUImageCopyExternalImage'(named 'srcDoFlipYDuringCopy' in cases)
+  - Valid 'flipY' config in 'GPUCopyExternalImageSourceInfo'(named 'srcDoFlipYDuringCopy' in cases)
   - TODO: color space tests need to be added
 
   And the expected results are all passed.
@@ -623,17 +627,12 @@ g.test('copy_contents_from_gpu_context_canvas')
       .combine('height', [1, 2, 4, 15])
   )
   .beforeAllSubcases(t => {
+    t.skipIfTextureFormatNotSupported(t.params.dstColorFormat);
     t.selectMismatchedDeviceOrSkipTestCase(undefined);
   })
   .fn(t => {
-    const {
-      width,
-      height,
-      canvasType,
-      srcAndDstInSameGPUDevice,
-      srcAlphaMode,
-      dstAlphaMode,
-    } = t.params;
+    const { width, height, canvasType, srcAndDstInSameGPUDevice, srcAlphaMode, dstAlphaMode } =
+      t.params;
 
     const device = srcAndDstInSameGPUDevice ? t.device : t.mismatchedDevice;
     const { canvas: source, expectedSourceData } = t.initSourceWebGPUCanvas({
@@ -666,10 +665,10 @@ g.test('copy_contents_from_bitmaprenderer_context_canvas')
   Then call copyExternalImageToTexture() to do a full copy to the 0 mipLevel
   of dst texture, and read the contents out to compare with the canvas contents.
 
-  Provide premultiplied input if 'premultipliedAlpha' in 'GPUImageCopyTextureTagged'
+  Provide premultiplied input if 'premultipliedAlpha' in 'GPUCopyExternalImageDestInfo'
   is set to 'true' and unpremultiplied input if it is set to 'false'.
 
-  If 'flipY' in 'GPUImageCopyExternalImage' is set to 'true', copy will ensure the result
+  If 'flipY' in 'GPUCopyExternalImageSourceInfo' is set to 'true', copy will ensure the result
   is flipped.
 
   The tests covers:
@@ -677,7 +676,7 @@ g.test('copy_contents_from_bitmaprenderer_context_canvas')
   - Valid ImageBitmapRendering context type
   - Valid dstColorFormat of copyExternalImageToTexture()
   - Valid dest alphaMode
-  - Valid 'flipY' config in 'GPUImageCopyExternalImage' (named 'srcDoFlipYDuringCopy' in cases)
+  - Valid 'flipY' config in 'GPUCopyExternalImageSourceInfo' (named 'srcDoFlipYDuringCopy' in cases)
   - TODO(#913): color space tests need to be added
 
   And the expected results are all passed.
@@ -693,6 +692,9 @@ g.test('copy_contents_from_bitmaprenderer_context_canvas')
       .combine('width', [1, 2, 4, 15])
       .combine('height', [1, 2, 4, 15])
   )
+  .beforeAllSubcases(t => {
+    t.skipIfTextureFormatNotSupported(t.params.dstColorFormat);
+  })
   .fn(async t => {
     const { width, height, canvasType, dstAlphaMode } = t.params;
 
@@ -734,10 +736,10 @@ g.test('color_space_conversion')
     Then call copyExternalImageToTexture() to do a full copy to the 0 mipLevel
     of dst texture, and read the contents out to compare with the canvas contents.
 
-    Provide premultiplied input if 'premultipliedAlpha' in 'GPUImageCopyTextureTagged'
+    Provide premultiplied input if 'premultipliedAlpha' in 'GPUCopyExternalImageDestInfo'
     is set to 'true' and unpremultiplied input if it is set to 'false'.
 
-    If 'flipY' in 'GPUImageCopyExternalImage' is set to 'true', copy will ensure the result
+    If 'flipY' in 'GPUCopyExternalImageSourceInfo' is set to 'true', copy will ensure the result
     is flipped.
 
     If color space from source input and user defined dstTexture color space are different, the
@@ -746,7 +748,7 @@ g.test('color_space_conversion')
     The tests covers:
     - Valid dstColorFormat of copyExternalImageToTexture()
     - Valid dest alphaMode
-    - Valid 'flipY' config in 'GPUImageCopyExternalImage' (named 'srcDoFlipYDuringCopy' in cases)
+    - Valid 'flipY' config in 'GPUCopyExternalImageSourceInfo' (named 'srcDoFlipYDuringCopy' in cases)
     - Valid 'colorSpace' config in 'dstColorSpace'
 
     And the expected results are all passed.
@@ -758,7 +760,7 @@ g.test('color_space_conversion')
   .params(u =>
     u
       .combine('srcColorSpace', ['srgb', 'display-p3'] as const)
-      .combine('dstColorSpace', ['srgb'] as const)
+      .combine('dstColorSpace', ['srgb', 'display-p3'] as const)
       .combine('dstColorFormat', kValidTextureFormatsForCopyE2T)
       .combine('dstPremultiplied', [true, false])
       .combine('srcDoFlipYDuringCopy', [true, false])
@@ -766,6 +768,9 @@ g.test('color_space_conversion')
       .combine('width', [1, 2, 4, 15, 255, 256])
       .combine('height', [1, 2, 4, 15, 255, 256])
   )
+  .beforeAllSubcases(t => {
+    t.skipIfTextureFormatNotSupported(t.params.dstColorFormat);
+  })
   .fn(t => {
     const {
       width,
@@ -782,7 +787,7 @@ g.test('color_space_conversion')
       colorSpace: srcColorSpace,
     });
 
-    const dst = t.device.createTexture({
+    const dst = t.createTextureTracked({
       size: { width, height },
       format: dstColorFormat,
       usage:

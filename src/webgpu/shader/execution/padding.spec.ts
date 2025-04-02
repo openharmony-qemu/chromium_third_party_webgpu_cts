@@ -26,7 +26,7 @@ function runShaderTest(t: GPUTest, wgsl: string, expected: Uint32Array): void {
 
   // Allocate a buffer and fill it with 0xdeadbeef words.
   const outputBuffer = t.makeBufferWithContents(
-    new Uint32Array([...iterRange(expected.length, x => 0xdeadbeef)]),
+    new Uint32Array([...iterRange(expected.length, _i => 0xdeadbeef)]),
     GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
   );
   const bindGroup = t.device.createBindGroup({
@@ -78,20 +78,11 @@ g.test('struct_implicit')
       wgsl,
       new Uint32Array([
         // a : u32
-        0x12345678,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x12345678, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // b : vec3<u32>
-        0xabcdef01,
-        0xabcdef01,
-        0xabcdef01,
-        0xdeadbeef,
+        0xabcdef01, 0xabcdef01, 0xabcdef01, 0xdeadbeef,
         // c : vec2<u32>
-        0x98765432,
-        0x98765432,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x98765432, 0x98765432, 0xdeadbeef, 0xdeadbeef,
       ])
     );
   });
@@ -127,20 +118,11 @@ g.test('struct_explicit')
       wgsl,
       new Uint32Array([
         // a : u32
-        0x12345678,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x12345678, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // @align(16) @size(20) b : u32
-        0xabcdef01,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0xabcdef01, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // @size(12) c : u32
-        0x98765432,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x98765432, 0xdeadbeef, 0xdeadbeef,
       ])
     );
   });
@@ -197,98 +179,47 @@ g.test('struct_nested')
       new Uint32Array([
         // a3 : S1
         // a3.a1 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // a3.b1 : vec3<u32>
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0x00000000, 0xdeadbeef,
         // a3.c1 : vec2<u32>
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0xdeadbeef, 0xdeadbeef,
 
         // b3 : S2
         // b3.a2 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // b3.b2 : S1
         // b3.b2.a1 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // b3.b2.b1 : vec3<u32>
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0x00000000, 0xdeadbeef,
         // b3.b2.c1 : vec2<u32>
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0xdeadbeef, 0xdeadbeef,
         // b3.c2 : S1
         // b3.c2.a1 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // b3.c2.b1 : vec3<u32>
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0x00000000, 0xdeadbeef,
         // b3.c2.c1 : vec2<u32>
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0xdeadbeef, 0xdeadbeef,
 
         // c3 : S2
         // c3.a2 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // c3.b2 : S1
         // c3.b2.a1 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // c3.b2.b1 : vec3<u32>
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0x00000000, 0xdeadbeef,
         // c3.b2.c1 : vec2<u32>
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0xdeadbeef, 0xdeadbeef,
         // c3.c2 : S1
         // c3.c2.a1 : u32
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef,
         // c3.c2.b1 : vec3<u32>
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0x00000000, 0xdeadbeef,
         // c3.c2.c1 : vec2<u32>
-        0x00000000,
-        0x00000000,
-        0xdeadbeef,
-        0xdeadbeef,
+        0x00000000, 0x00000000, 0xdeadbeef, 0xdeadbeef,
       ])
     );
   });
@@ -321,25 +252,94 @@ g.test('array_of_vec3')
       wgsl,
       new Uint32Array([
         // buffer[0]
-        0x12345678,
-        0x12345678,
-        0x12345678,
-        0xdeadbeef,
+        0x12345678, 0x12345678, 0x12345678, 0xdeadbeef,
         // buffer[1]
-        0xabcdef01,
-        0xabcdef01,
-        0xabcdef01,
-        0xdeadbeef,
+        0xabcdef01, 0xabcdef01, 0xabcdef01, 0xdeadbeef,
         // buffer[2]
-        0x98765432,
-        0x98765432,
-        0x98765432,
-        0xdeadbeef,
+        0x98765432, 0x98765432, 0x98765432, 0xdeadbeef,
         // buffer[2]
-        0x0f0f0f0f,
-        0x0f0f0f0f,
-        0x0f0f0f0f,
-        0xdeadbeef,
+        0x0f0f0f0f, 0x0f0f0f0f, 0x0f0f0f0f, 0xdeadbeef,
+      ])
+    );
+  });
+
+g.test('array_of_vec3h')
+  .desc(
+    `Test that padding bytes in between array elements are preserved when f16 elements are used.
+
+     This test defines creates a read-write storage buffer with type array<vec3h, 4>. The shader
+     assigns the whole variable at once, and we then test that data in the padding bytes was
+     preserved.
+    `
+  )
+  .beforeAllSubcases(t => {
+    t.selectDeviceOrSkipTestCase('shader-f16');
+  })
+  .fn(t => {
+    const wgsl = `
+      enable f16;
+      @group(0) @binding(0) var<storage, read_write> buffer : array<vec3<f16>, 4>;
+
+      @compute @workgroup_size(1)
+      fn main() {
+        buffer = array<vec3<f16>, 4>(
+          vec3(1h),
+          vec3(2h),
+          vec3(3h),
+          vec3(4h),
+        );
+      }
+    `;
+    runShaderTest(
+      t,
+      wgsl,
+      new Uint32Array([
+        // buffer[0]
+        0x3c003c00, 0xdead3c00,
+        // buffer[1]
+        0x40004000, 0xdead4000,
+        // buffer[2]
+        0x42004200, 0xdead4200,
+        // buffer[2]
+        0x44004400, 0xdead4400,
+      ])
+    );
+  });
+
+g.test('array_of_vec3h,elementwise')
+  .desc(
+    `Test that padding bytes in between array elements are preserved when f16 elements are used.
+
+     This test defines creates a read-write storage buffer with type array<vec3h, 4>. The shader
+     assigns one element per thread, and we then test that data in the padding bytes was
+     preserved.
+    `
+  )
+  .beforeAllSubcases(t => {
+    t.selectDeviceOrSkipTestCase('shader-f16');
+  })
+  .fn(t => {
+    const wgsl = `
+      enable f16;
+      @group(0) @binding(0) var<storage, read_write> buffer : array<vec3<f16>>;
+
+      @compute @workgroup_size(4)
+      fn main(@builtin(local_invocation_index) lid : u32) {
+        buffer[lid] = vec3h(f16(lid + 1));
+      }
+    `;
+    runShaderTest(
+      t,
+      wgsl,
+      new Uint32Array([
+        // buffer[0]
+        0x3c003c00, 0xdead3c00,
+        // buffer[1]
+        0x40004000, 0xdead4000,
+        // buffer[2]
+        0x42004200, 0xdead4200,
+        // buffer[2]
+        0x44004400, 0xdead4400,
       ])
     );
   });
@@ -375,31 +375,13 @@ g.test('array_of_struct')
       wgsl,
       new Uint32Array([
         // buffer[0]
-        0x12345678,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
-        0x0f0f0f0f,
-        0x0f0f0f0f,
-        0x0f0f0f0f,
+        0x12345678, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0x0f0f0f0f, 0x0f0f0f0f, 0x0f0f0f0f,
         0xdeadbeef,
         // buffer[1]
-        0xabcdef01,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
-        0x7c7c7c7c,
-        0x7c7c7c7c,
-        0x7c7c7c7c,
+        0xabcdef01, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0x7c7c7c7c, 0x7c7c7c7c, 0x7c7c7c7c,
         0xdeadbeef,
         // buffer[2]
-        0x98765432,
-        0xdeadbeef,
-        0xdeadbeef,
-        0xdeadbeef,
-        0x18181818,
-        0x18181818,
-        0x18181818,
+        0x98765432, 0xdeadbeef, 0xdeadbeef, 0xdeadbeef, 0x18181818, 0x18181818, 0x18181818,
         0xdeadbeef,
       ])
     );

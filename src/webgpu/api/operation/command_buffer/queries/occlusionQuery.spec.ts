@@ -26,7 +26,8 @@ import {
   range,
   unreachable,
 } from '../../../../../common/util/util.js';
-import { kMaxQueryCount, DepthStencilFormat } from '../../../../capability_info.js';
+import { kMaxQueryCount } from '../../../../capability_info.js';
+import { DepthStencilFormat } from '../../../../format_info.js';
 import { GPUTest } from '../../../../gpu_test.js';
 
 const kRequiredQueryBufferOffsetAlignment = 256;
@@ -34,10 +35,10 @@ const kBytesPerQuery = 8;
 const kTextureSize = [4, 4];
 
 const kRenderModes = ['direct', 'render-bundle'] as const;
-type RenderMode = typeof kRenderModes[number];
+type RenderMode = (typeof kRenderModes)[number];
 
 const kBufferOffsets = ['zero', 'non-zero'] as const;
-type BufferOffset = typeof kBufferOffsets[number];
+type BufferOffset = (typeof kBufferOffsets)[number];
 
 type SetupParams = {
   numQueries: number;
@@ -211,7 +212,9 @@ class QueryStarterRenderBundle implements QueryStarter {
   ) {
     this._device = device;
     this._pass = pass;
-    const colorAttachment = (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0];
+    const colorAttachment = (
+      renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+    )[0];
     this._renderBundleEncoderDescriptor = {
       colorFormats: ['rgba8unorm'],
       depthStencilFormat: renderPassDescriptor.depthStencilAttachment?.depthLoadOp
@@ -250,15 +253,6 @@ class QueryStarterRenderBundle implements QueryStarter {
 }
 
 class OcclusionQueryTest extends GPUTest {
-  createBuffer(desc: GPUBufferDescriptor) {
-    return this.trackForCleanup(this.device.createBuffer(desc));
-  }
-  createTexture(desc: GPUTextureDescriptor) {
-    return this.trackForCleanup(this.device.createTexture(desc));
-  }
-  createQuerySet(desc: GPUQuerySetDescriptor) {
-    return this.trackForCleanup(this.device.createQuerySet(desc));
-  }
   createVertexBuffer(data: TypedArrayBufferView) {
     return this.makeBufferWithContents(data, GPUBufferUsage.VERTEX);
   }
@@ -291,26 +285,26 @@ class OcclusionQueryTest extends GPUTest {
 
     const queryResolveBufferOffset =
       bufferOffset === 'non-zero' ? kRequiredQueryBufferOffsetAlignment : 0;
-    const queryResolveBuffer = this.createBuffer({
+    const queryResolveBuffer = this.createBufferTracked({
       size: numQueries * 8 + queryResolveBufferOffset,
       usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
     });
 
-    const readBuffer = this.createBuffer({
+    const readBuffer = this.createBufferTracked({
       size: numQueries * kBytesPerQuery,
       usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
     });
 
     const vertexBuffer = this.createSingleTriangleVertexBuffer(0);
 
-    const renderTargetTexture = this.createTexture({
+    const renderTargetTexture = this.createTextureTracked({
       format: 'rgba8unorm',
       size: kTextureSize,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
     const multisampleRenderTarget = sampleCount
-      ? this.createTexture({
+      ? this.createTextureTracked({
           size: kTextureSize,
           format: 'rgba8unorm',
           usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -319,7 +313,7 @@ class OcclusionQueryTest extends GPUTest {
       : null;
 
     const depthStencilTexture = depthStencilFormat
-      ? this.createTexture({
+      ? this.createTextureTracked({
           format: depthStencilFormat,
           size: kTextureSize,
           usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -387,7 +381,7 @@ class OcclusionQueryTest extends GPUTest {
     });
 
     const querySetOffset = params?.querySetOffset === 'non-zero' ? 7 : 0;
-    const occlusionQuerySet = this.createQuerySet({
+    const occlusionQuerySet = this.createQuerySetTracked({
       type: 'occlusion',
       count: numQueries + querySetOffset,
     });
@@ -692,7 +686,7 @@ g.test('occlusion_query,scissor')
         const expectPassed = !occluded;
         t.expect(
           !!passed === expectPassed,
-          `queryIndex: ${queryIndex}, scissorCase: ${scissorCase}, was: ${!!passed}, expected: ${expectPassed}, ${name}`
+          `queryIndex: ${queryIndex}, scissorCase: ${scissorCase}, was: ${!!passed}, expected: ${expectPassed}`
         );
       }
     );
@@ -736,7 +730,7 @@ g.test('occlusion_query,depth')
         const expectPassed = queryIndex % 2 === 0;
         t.expect(
           !!passed === expectPassed,
-          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}, ${name}`
+          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}`
         );
       }
     );
@@ -780,7 +774,7 @@ g.test('occlusion_query,stencil')
         const expectPassed = queryIndex % 2 === 0;
         t.expect(
           !!passed === expectPassed,
-          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}, ${name}`
+          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}`
         );
       }
     );
@@ -848,7 +842,7 @@ g.test('occlusion_query,sample_mask')
         const expectPassed = !!(sampleMask & drawMask);
         t.expect(
           !!passed === expectPassed,
-          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}, ${name}`
+          `queryIndex: ${queryIndex}, was: ${!!passed}, expected: ${expectPassed}`
         );
       }
     );
@@ -955,8 +949,8 @@ g.test('occlusion_query,multi_resolve')
       readBuffer,
     } = t.setup({ numQueries: kNumQueries });
 
-    const readBuffer2 = t.createBuffer(readBuffer);
-    const readBuffer3 = t.createBuffer(readBuffer);
+    const readBuffer2 = t.createBufferTracked(readBuffer);
+    const readBuffer3 = t.createBufferTracked(readBuffer);
 
     const renderSomething = (encoder: GPUCommandEncoder) => {
       const pass = encoder.beginRenderPass(renderPassDescriptor);

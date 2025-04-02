@@ -3,7 +3,8 @@ Destroying a texture more than once is allowed.
 `;
 
 import { makeTestGroup } from '../../../../common/framework/test_group.js';
-import { kTextureAspects, kTextureFormatInfo } from '../../../capability_info.js';
+import { kTextureAspects } from '../../../capability_info.js';
+import { kTextureFormatInfo } from '../../../format_info.js';
 import { ValidationTest } from '../validation_test.js';
 
 export const g = makeTestGroup(ValidationTest);
@@ -28,7 +29,7 @@ g.test('invalid_texture')
   .fn(async t => {
     t.device.pushErrorScope('validation');
 
-    const invalidTexture = t.device.createTexture({
+    const invalidTexture = t.createTextureTracked({
       size: [t.device.limits.maxTextureDimension2D + 1, 1, 1],
       format: 'rgba8unorm',
       usage: GPUTextureUsage.TEXTURE_BINDING,
@@ -88,8 +89,8 @@ that was destroyed {before, after} encoding finishes.
       usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
     };
 
-    const colorTexture = t.device.createTexture(colorTextureDesc);
-    const depthStencilTexture = t.device.createTexture(depthStencilTextureDesc);
+    const colorTexture = t.createTextureTracked(colorTextureDesc);
+    const depthStencilTexture = t.createTextureTracked(depthStencilTextureDesc);
 
     if (colorTextureState === 'destroyedBeforeEncode') {
       colorTexture.destroy();
