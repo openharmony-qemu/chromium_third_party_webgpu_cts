@@ -5,12 +5,15 @@ This test dedicatedly tests validation of GPUDepthStencilState of createRenderPi
 import { makeTestGroup } from '../../../../common/framework/test_group.js';
 import { unreachable } from '../../../../common/util/util.js';
 import {
-  kTextureFormats,
-  kTextureFormatInfo,
-  kDepthStencilFormats,
   kCompareFunctions,
+  kPrimitiveTopology,
   kStencilOperations,
 } from '../../../capability_info.js';
+import {
+  kAllTextureFormats,
+  kTextureFormatInfo,
+  kDepthStencilFormats,
+} from '../../../format_info.js';
 import { getFragmentShaderCodeWithOutput } from '../../../util/shader.js';
 
 import { CreateRenderPipelineValidationTest } from './common.js';
@@ -19,10 +22,15 @@ export const g = makeTestGroup(CreateRenderPipelineValidationTest);
 
 g.test('format')
   .desc(`The texture format in depthStencilState must be a depth/stencil format.`)
-  .params(u => u.combine('isAsync', [false, true]).combine('format', kTextureFormats))
+  .params(u =>
+    u //
+      .combine('isAsync', [false, true])
+      .combine('format', kAllTextureFormats)
+  )
   .beforeAllSubcases(t => {
     const { format } = t.params;
     const info = kTextureFormatInfo[format];
+    t.skipIfTextureFormatNotSupported(format);
     t.selectDeviceOrSkipTestCase(info.feature);
   })
   .fn(t => {
@@ -33,7 +41,89 @@ g.test('format')
       depthStencil: { format, depthWriteEnabled: false, depthCompare: 'always' },
     });
 
-    t.doCreateRenderPipelineTest(isAsync, info.depth || info.stencil, descriptor);
+    t.doCreateRenderPipelineTest(isAsync, !!info.depth || !!info.stencil, descriptor);
+  });
+
+g.test('depthCompare_optional')
+  .desc(
+    `The depthCompare in depthStencilState is optional for stencil-only formats but
+    required for formats with a depth if depthCompare is not used for anything.`
+  )
+  .params(u =>
+    u
+      .combine('isAsync', [false, true])
+      .combine('format', kDepthStencilFormats)
+      .beginSubcases()
+      .combine('depthCompare', ['always', undefined] as const)
+      .combine('depthWriteEnabled', [false, true, undefined] as const)
+      .combine('stencilFrontDepthFailOp', ['keep', 'zero'] as const)
+      .combine('stencilBackDepthFailOp', ['keep', 'zero'] as const)
+  )
+  .beforeAllSubcases(t => {
+    const { format } = t.params;
+    const info = kTextureFormatInfo[format];
+    t.skipIfTextureFormatNotSupported(format);
+    t.selectDeviceOrSkipTestCase(info.feature);
+  })
+  .fn(t => {
+    const {
+      isAsync,
+      format,
+      depthCompare,
+      depthWriteEnabled,
+      stencilFrontDepthFailOp,
+      stencilBackDepthFailOp,
+    } = t.params;
+    const info = kTextureFormatInfo[format];
+    const descriptor = t.getDescriptor({
+      depthStencil: {
+        format,
+        depthCompare,
+        depthWriteEnabled,
+        stencilFront: { depthFailOp: stencilFrontDepthFailOp },
+        stencilBack: { depthFailOp: stencilBackDepthFailOp },
+      },
+    });
+
+    const depthFailOpsAreKeep =
+      stencilFrontDepthFailOp === 'keep' && stencilBackDepthFailOp === 'keep';
+    const stencilStateIsDefault = depthFailOpsAreKeep;
+    let success = true;
+    if (depthWriteEnabled || (depthCompare && depthCompare !== 'always')) {
+      if (!info.depth) success = false;
+    }
+    if (!stencilStateIsDefault) {
+      if (!info.stencil) success = false;
+    }
+    if (info.depth) {
+      if (depthWriteEnabled === undefined) success = false;
+      if (depthWriteEnabled || !depthFailOpsAreKeep) {
+        if (depthCompare === undefined) success = false;
+      }
+    }
+
+    t.doCreateRenderPipelineTest(isAsync, success, descriptor);
+  });
+
+g.test('depthWriteEnabled_optional')
+  .desc(
+    `The depthWriteEnabled in depthStencilState is optional for stencil-only formats but required for formats with a depth.`
+  )
+  .params(u => u.combine('isAsync', [false, true]).combine('format', kDepthStencilFormats))
+  .beforeAllSubcases(t => {
+    const { format } = t.params;
+    const info = kTextureFormatInfo[format];
+    t.skipIfTextureFormatNotSupported(format);
+    t.selectDeviceOrSkipTestCase(info.feature);
+  })
+  .fn(t => {
+    const { isAsync, format } = t.params;
+    const info = kTextureFormatInfo[format];
+    const descriptor = t.getDescriptor({
+      depthStencil: { format, depthCompare: 'always', depthWriteEnabled: undefined },
+    });
+
+    t.doCreateRenderPipelineTest(isAsync, !info.depth, descriptor);
   });
 
 g.test('depth_test')
@@ -60,7 +150,7 @@ g.test('depth_test')
     });
 
     const depthTestEnabled = depthCompare !== undefined && depthCompare !== 'always';
-    t.doCreateRenderPipelineTest(isAsync, !depthTestEnabled || info.depth, descriptor);
+    t.doCreateRenderPipelineTest(isAsync, !depthTestEnabled || !!info.depth, descriptor);
   });
 
 g.test('depth_write')
@@ -85,7 +175,7 @@ g.test('depth_write')
     const descriptor = t.getDescriptor({
       depthStencil: { format, depthWriteEnabled, depthCompare: 'always' },
     });
-    t.doCreateRenderPipelineTest(isAsync, !depthWriteEnabled || info.depth, descriptor);
+    t.doCreateRenderPipelineTest(isAsync, !depthWriteEnabled || !!info.depth, descriptor);
   });
 
 g.test('depth_write,frag_depth')
@@ -115,8 +205,49 @@ g.test('depth_write,frag_depth')
       ),
     });
 
-    const hasDepth = format ? kTextureFormatInfo[format].depth : false;
+    const hasDepth = format ? !!kTextureFormatInfo[format].depth : false;
     t.doCreateRenderPipelineTest(isAsync, hasDepth, descriptor);
+  });
+
+g.test('depth_bias')
+  .desc(`Depth bias parameters are only valid with triangle topologies.`)
+  .params(u =>
+    u
+      .combine('isAsync', [false, true])
+      .combine('topology', kPrimitiveTopology)
+      .beginSubcases()
+      .combineWithParams([
+        {},
+        { depthBias: -1 },
+        { depthBias: 0 },
+        { depthBias: 1 },
+        { depthBiasSlopeScale: -1 },
+        { depthBiasSlopeScale: 0 },
+        { depthBiasSlopeScale: 1 },
+        { depthBiasClamp: -1 },
+        { depthBiasClamp: 0 },
+        { depthBiasClamp: 1 },
+      ])
+  )
+  .fn(t => {
+    const { isAsync, topology, depthBias, depthBiasSlopeScale, depthBiasClamp } = t.params;
+
+    const isTriangleTopology = topology === 'triangle-list' || topology === 'triangle-strip';
+    const hasDepthBias = !!depthBias || !!depthBiasSlopeScale || !!depthBiasClamp;
+    const shouldSucceed = !hasDepthBias || isTriangleTopology;
+
+    const descriptor = t.getDescriptor({
+      primitive: { topology },
+      depthStencil: {
+        format: 'depth24plus',
+        depthWriteEnabled: true,
+        depthCompare: 'less-equal',
+        depthBias,
+        depthBiasSlopeScale,
+        depthBiasClamp,
+      },
+    });
+    t.doCreateRenderPipelineTest(isAsync, shouldSucceed, descriptor);
   });
 
 g.test('stencil_test')
@@ -161,7 +292,7 @@ g.test('stencil_test')
     }
 
     const stencilTestEnabled = compare !== undefined && compare !== 'always';
-    t.doCreateRenderPipelineTest(isAsync, !stencilTestEnabled || info.stencil, descriptor);
+    t.doCreateRenderPipelineTest(isAsync, !stencilTestEnabled || !!info.stencil, descriptor);
   });
 
 g.test('stencil_write')
@@ -222,5 +353,5 @@ g.test('stencil_write')
     const descriptor = t.getDescriptor({ depthStencil });
 
     const stencilWriteEnabled = op !== undefined && op !== 'keep';
-    t.doCreateRenderPipelineTest(isAsync, !stencilWriteEnabled || info.stencil, descriptor);
+    t.doCreateRenderPipelineTest(isAsync, !stencilWriteEnabled || !!info.stencil, descriptor);
   });
