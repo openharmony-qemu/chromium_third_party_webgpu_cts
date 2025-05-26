@@ -24,7 +24,6 @@ import {
 import { FP } from '../../../../../util/floating_point.js';
 
 import {
-  kDataSentinel,
   kNumCases,
   kStride,
   kWGSizes,
@@ -302,7 +301,7 @@ function checkPredicatedMultiplication(
         }
       }
     } else {
-      expected = kDataSentinel;
+      expected = 999;
     }
     if (expected !== output[i]) {
       return new Error(`Invocation ${i}: incorrect result

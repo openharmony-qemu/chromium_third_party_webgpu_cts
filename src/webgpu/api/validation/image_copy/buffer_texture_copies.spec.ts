@@ -18,8 +18,8 @@ import { ValidationTest } from '../validation_test.js';
 
 class ImageCopyTest extends ValidationTest {
   testCopyBufferToTexture(
-    source: GPUTexelCopyBufferInfo,
-    destination: GPUTexelCopyTextureInfo,
+    source: GPUImageCopyBuffer,
+    destination: GPUImageCopyTexture,
     copySize: GPUExtent3DStrict,
     isSuccess: boolean
   ): void {
@@ -29,8 +29,8 @@ class ImageCopyTest extends ValidationTest {
   }
 
   testCopyTextureToBuffer(
-    source: GPUTexelCopyTextureInfo,
-    destination: GPUTexelCopyBufferInfo,
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyBuffer,
     copySize: GPUExtent3DStrict,
     isSuccess: boolean
   ): void {
@@ -40,9 +40,9 @@ class ImageCopyTest extends ValidationTest {
   }
 
   testWriteTexture(
-    destination: GPUTexelCopyTextureInfo,
+    destination: GPUImageCopyTexture,
     uploadData: Uint8Array,
-    dataLayout: GPUTexelCopyBufferLayout,
+    dataLayout: GPUImageDataLayout,
     copySize: GPUExtent3DStrict,
     isSuccess: boolean
   ): void {

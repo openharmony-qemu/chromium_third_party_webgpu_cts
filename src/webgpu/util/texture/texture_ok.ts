@@ -167,7 +167,7 @@ function comparePerComponent(
 /** Create a new mappable GPUBuffer, and copy a subrectangle of GPUTexture data into it. */
 function createTextureCopyForMapRead(
   t: GPUTest,
-  source: GPUTexelCopyTextureInfo,
+  source: GPUImageCopyTexture,
   copySize: GPUExtent3D,
   { format }: { format: EncodableTextureFormat }
 ): { buffer: GPUBuffer; bytesPerRow: number; rowsPerImage: number } {
@@ -298,7 +298,7 @@ ${generatePrettyTable(opts, [
  */
 export async function textureContentIsOKByT2B(
   t: GPUTest,
-  source: GPUTexelCopyTextureInfo,
+  source: GPUImageCopyTexture,
   copySize_: GPUExtent3D,
   { expTexelView }: { expTexelView: TexelView },
   texelCompareOptions: TexelCompareOptions,
