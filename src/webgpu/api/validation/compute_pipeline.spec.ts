@@ -718,7 +718,6 @@ g.test('resource_compatibility')
         !t.hasLanguageFeature('readonly_and_readwrite_storage_textures'),
       'Storage textures require language feature'
     );
-    t.skipIfTextureViewDimensionNotSupported(wgslResource.texture?.viewDimension);
 
     const layout = t.device.createPipelineLayout({
       bindGroupLayouts: [
