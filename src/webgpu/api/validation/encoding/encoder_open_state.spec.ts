@@ -6,11 +6,12 @@ GPURenderPassEncoder when the encoder is not finished.
 import { makeTestGroup } from '../../../../common/framework/test_group.js';
 import { keysOf } from '../../../../common/util/data_tables.js';
 import { unreachable } from '../../../../common/util/util.js';
-import { ValidationTest } from '../validation_test.js';
+import { AllFeaturesMaxLimitsGPUTest } from '../../../gpu_test.js';
+import * as vtu from '../validation_test_utils.js';
 
 import { beginRenderPassWithQuerySet } from './queries/common.js';
 
-class F extends ValidationTest {
+class F extends AllFeaturesMaxLimitsGPUTest {
   createRenderPipelineForTest(): GPURenderPipeline {
     return this.device.createRenderPipeline({
       layout: 'auto',
@@ -79,7 +80,11 @@ const kEncoderCommandInfo: {
 };
 const kEncoderCommands = keysOf(kEncoderCommandInfo);
 
-type RenderPassEncoderCommands = keyof Omit<GPURenderPassEncoder, '__brand' | 'label' | 'end'>;
+// MAINTENANCE_TODO: Remove multiDrawIndirect and multiDrawIndexedIndirect once https://github.com/gpuweb/gpuweb/pull/2315 is merged.
+type RenderPassEncoderCommands =
+  | keyof Omit<GPURenderPassEncoder, '__brand' | 'label' | 'end'>
+  | 'multiDrawIndirect'
+  | 'multiDrawIndexedIndirect';
 const kRenderPassEncoderCommandInfo: {
   readonly [k in RenderPassEncoderCommands]: {};
 } = {
@@ -87,6 +92,8 @@ const kRenderPassEncoderCommandInfo: {
   drawIndexed: {},
   drawIndexedIndirect: {},
   drawIndirect: {},
+  multiDrawIndexedIndirect: {},
+  multiDrawIndirect: {},
   setIndexBuffer: {},
   setBindGroup: {},
   setVertexBuffer: {},
@@ -159,15 +166,11 @@ g.test('non_pass_commands')
       .beginSubcases()
       .combine('finishBeforeCommand', [false, true])
   )
-  .beforeAllSubcases(t => {
-    switch (t.params.command) {
-      case 'writeTimestamp':
-        t.selectDeviceOrSkipTestCase('timestamp-query');
-        break;
-    }
-  })
   .fn(t => {
     const { command, finishBeforeCommand } = t.params;
+    if (command === 'writeTimestamp') {
+      t.skipIfDeviceDoesNotSupportQueryType('timestamp');
+    }
 
     const srcBuffer = t.createBufferTracked({
       size: 16,
@@ -300,6 +303,11 @@ g.test('render_pass_commands')
   )
   .fn(t => {
     const { command, finishBeforeCommand } = t.params;
+    if (command === 'multiDrawIndirect' || command === 'multiDrawIndexedIndirect') {
+      t.skipIfDeviceDoesNotHaveFeature(
+        'chromium-experimental-multi-draw-indirect' as GPUFeatureName
+      );
+    }
 
     const querySet = t.createQuerySetTracked({ type: 'occlusion', count: 1 });
     const encoder = t.device.createCommandEncoder();
@@ -344,6 +352,18 @@ g.test('render_pass_commands')
         case 'drawIndexedIndirect':
           {
             renderPass.drawIndexedIndirect(buffer, 0);
+          }
+          break;
+        case 'multiDrawIndirect':
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (renderPass as any).multiDrawIndirect(buffer, 0, 1);
+          }
+          break;
+        case 'multiDrawIndexedIndirect':
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (renderPass as any).multiDrawIndexedIndirect(buffer, 0, 1);
           }
           break;
         case 'setBindGroup':
@@ -542,7 +562,7 @@ g.test('compute_pass_commands')
       usage: GPUBufferUsage.INDIRECT,
     });
 
-    const computePipeline = t.createNoOpComputePipeline();
+    const computePipeline = vtu.createNoOpComputePipeline(t);
 
     const bindGroup = t.createBindGroupForTest();
 
